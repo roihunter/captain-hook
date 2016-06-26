@@ -22,11 +22,18 @@ def logger():
     logger.addHandler(handler)
 
     if not settings.DEVELOPMENT_MODE:
-        handler = graypy.GELFHandler(settings.graylog["host"], settings.graylog["port"])
+        handler = graypy.GELFHandler(settings.GRAYLOG_HOST, settings.GRAYLOG_PORT)
         logger.addHandler(handler)
 
     return logger
 
 
 def publisher():
-    return RabbitPublisher(**settings.messaging)
+    return RabbitPublisher(
+        settings.RABBIT_LOGIN,
+        settings.RABBIT_PASSWORD,
+        settings.RABBIT_HOST,
+        settings.RABBIT_PORT,
+        settings.RABBIT_VIRTUAL_HOST,
+        settings.RABBIT_EXCHANGE
+    )

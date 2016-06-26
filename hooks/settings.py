@@ -1,25 +1,17 @@
 # -*- coding: utf-8 -*-
 
-messaging = {
-    "login": "guest",
-    "password": "guest",
-    "host": "localhost",
-    "port": 5672,
-    "virtual_host": "hooks",
-
-    "exchange_name": "events",
-    "queue_master": "events.master",
-    "queue_staging": "events.staging",
-    "queue_testing": "events.testing",
-}
-
-graylog = {
-    "host": None,
-    "port": None,
-}
-
 DEVELOPMENT_MODE = True
 FACEBOOK_VERIFY_TOKEN = "token"
+
+RABBIT_LOGIN = "guest"
+RABBIT_PASSWORD = "guest"
+RABBIT_HOST = "localhost"
+RABBIT_PORT = 5672
+RABBIT_VIRTUAL_HOST = "hooks"
+RABBIT_EXCHANGE = "events"
+
+GRAYLOG_HOST = None
+GRAYLOG_PORT = None
 
 
 try:
