@@ -19,3 +19,11 @@ Create local configuration file `hooks/settings_local.py`.
 
 *  `/api/v1/{scope}/fb/hooks`
 	* scope is one of master, staging or testing
+
+## Docker
+
+Build image from Dockerfile.
+`docker build -t captain-hook .`
+
+Run container from image. API will run on port 8005 (see `supervisord.conf`).
+`docker run --name captain-hook -p 8005:8005 -d captain-hook`

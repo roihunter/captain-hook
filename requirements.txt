@@ -2,6 +2,5 @@ falcon==1.0.0
 graypy==0.2.13
 gunicorn==19.6.0
 pika==0.10.0
-pkg-resources==0.0.0
 python-mimeparse==1.5.2
 six==1.10.0
