@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import json
 import falcon
+import pika.exceptions
 from . import services
 from . import settings
 
@@ -33,20 +33,14 @@ class FacebookHooks:
         payload = req.stream.read().decode("utf-8")
         self._logger.info("POST scope: %s payload: %r", scope, payload)
 
-        json_data = json.loads(payload)
+        try:
+            with self._publisher as publisher:
+                publisher.send_event(scope, payload)
+            resp.status = falcon.HTTP_200
 
-        # TODO rabbitmq may fail here
-        with self._publisher as publisher:
-            publisher.send_event(scope, payload)
-
-        resp.status = falcon.HTTP_200
-
-
-def json_error_handler(ex, req, resp, params):
-    services.logger().exception("JSON Decoding failed. Request: %s", req, exc_info=ex)
-
-    resp.status = falcon.HTTP_400
-    resp.body = "JSON Decoding failed: %s \n" % ex
+        except pika.exceptions.AMQPError:
+            self._logger.exception("Exception while publishing to RabbitMQ.")
+            resp.status = falcon.HTTP_500
 
 
 class API(falcon.API):
@@ -54,4 +48,3 @@ class API(falcon.API):
         super().__init__(*args, **kwargs)
         self.add_route("/health", Health())
         self.add_route(_API_PREFIX + "/{scope}/fb/hooks", FacebookHooks())
-        self.add_error_handler(json.JSONDecodeError, json_error_handler)
