@@ -24,4 +24,13 @@ class RabbitPublisher:
         self._connection.close()
 
     def send_event(self, scope, json_data):
-        self._channel.basic_publish(exchange=self._exchange_name, routing_key=scope, body=json_data)
+        self._channel.basic_publish(
+            exchange=self._exchange_name,
+            routing_key=scope,
+            body=json_data,
+            properties=pika.BasicProperties(
+                headers={"__TypeId__": "HookEventMessage"},
+                content_encoding="utf-8",
+                content_type="application/json"
+            )
+        )
