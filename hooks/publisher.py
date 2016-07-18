@@ -4,6 +4,8 @@ import pika
 
 
 class RabbitPublisher:
+    PERSISTENT_MESSAGE_FLAG = 2
+
     def __init__(self, login, password, host, port, virtual_host, exchange_name):
         self._login = login
         self._password = password
@@ -31,6 +33,7 @@ class RabbitPublisher:
             properties=pika.BasicProperties(
                 headers={"__TypeId__": "HookEventMessage"},
                 content_encoding="utf-8",
-                content_type="application/json"
+                content_type="application/json",
+                delivery_mode=self.PERSISTENT_MESSAGE_FLAG
             )
         )

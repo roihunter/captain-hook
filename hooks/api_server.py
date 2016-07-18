@@ -22,16 +22,16 @@ class FacebookHooks:
 
     def on_get(self, req, resp, scope):
         if req.get_param("hub.mode") == "subscribe" and req.get_param("hub.verify_token") == settings.FACEBOOK_VERIFY_TOKEN:
-            self._logger.info("GET 200 scope %s params: %s", scope, req.params)
+            self._logger.info("GET 200 scope %s params: %s headers: %s", scope, req.params, req.headers)
             resp.status = falcon.HTTP_200
             resp.body = req.get_param("hub.challenge")
         else:
-            self._logger.info("GET 400 scope %s params: %s", scope, req.params)
+            self._logger.info("GET 400 scope %s params: %s headers: %s", scope, req.params, req.headers)
             resp.status = falcon.HTTP_400
 
     def on_post(self, req, resp, scope):
         payload = req.stream.read().decode("utf-8")
-        self._logger.info("POST scope: %s payload: %r", scope, payload)
+        self._logger.info("POST scope: %s payload: %r headers: %s", scope, payload, req.headers)
 
         try:
             with self._publisher as publisher:
