@@ -2,6 +2,8 @@
 
 import falcon
 import pika.exceptions
+import requests
+
 from . import services
 from . import settings
 
@@ -43,8 +45,38 @@ class FacebookHooks:
             resp.status = falcon.HTTP_500
 
 
+class CorsProxy:
+    def __init__(self):
+        self._logger = services.logger()
+
+    def __call__(self, req, resp):
+        resp.set_header("access-control-allow-origin", "*")
+        resp.set_header("access-control-allow-methods", "GET")
+        resp.set_header("access-control-max-age", "21600")
+        allow_headers = req.get_header("access-control-request-headers")
+        if allow_headers:
+            resp.set_header("access-control-allow-headers", allow_headers)
+
+        url = req.relative_uri.replace(_API_PREFIX + "/proxy/", "")
+
+        try:
+            self._logger.info("Trying to proxy URL: %s", url)
+            response = requests.get(url)
+            response.raise_for_status()
+
+            resp.data = response.content
+            resp.content_type = response.headers["Content-Type"]
+            resp.status = falcon.HTTP_200
+        except requests.HTTPError:
+            resp.status = str(response.status_code) + " " + response.reason
+        except:
+            self._logger.exception("Not able to proxy URL: %s", url)
+            resp.status = falcon.HTTP_400
+
+
 class API(falcon.API):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.add_route("/health", Health())
         self.add_route(_API_PREFIX + "/{scope}/fb/hooks", FacebookHooks())
+        self.add_sink(CorsProxy(), _API_PREFIX + "/proxy/")
