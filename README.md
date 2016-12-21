@@ -11,6 +11,12 @@ pip install --use-wheel -r requirements-dev.txt
 ```
 Create local configuration file `hooks/settings_local.py`.
 
+## API server
+
+* `python -m hooks`
+    * debugging
+* `gunicorn --workers=4 --bind 0.0.0.0:8005 hooks.app:app`
+    * production ready
 
 ## API endpoints
 
@@ -18,8 +24,11 @@ Create local configuration file `hooks/settings_local.py`.
     * check if service is alive
 
 *  `/api/v1/{scope}/fb/hooks`
-	* scope is one of master, staging or testing
+	* *scope* is one of master, staging or testing
 
+*  `/api/v1/proxy/{url}`
+	* *url* can be any url, e.g. http://www.google.com
+	
 ## Docker
 
 Build image from Dockerfile.
