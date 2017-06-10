@@ -1,7 +1,5 @@
-########################################################
-# Dockerfile to build Python application 'captain-hook'
-# Based on Debain
-########################################################
+# docker build --rm=true -t cpt-hook:latest .
+# docker run --rm -it --publish=8005:8005 -v "/c/Users/m/Work/hook:/captain-hook" --name=cpt-hook cpt-hook:latest gunicorn --workers=2 --bind 0.0.0.0:8005 hooks.app:app
 
 FROM debian
 MAINTAINER ROI Hunter

@@ -49,6 +49,7 @@ class FacebookHooks:
 
 
 class CorsProxy:
+    _DEFAULT_USER_AGENT = "ROI Hunter/CORS proxy; http://roihunter.com/"
     _ALLANI_PL_PATTERN = re.compile(r"(?P<prefix>http://st\.allani\.pl/.+/)(?P<url>http.+)$", re.UNICODE)
 
     def __init__(self):
@@ -67,7 +68,7 @@ class CorsProxy:
 
         try:
             self._logger.info("Trying to proxy URL: %s", url)
-            response = requests.get(url)
+            response = requests.get(url, headers={"User-Agent": self._get_user_agent(req)})
             response.raise_for_status()
 
             resp.data = response.content
@@ -90,6 +91,14 @@ class CorsProxy:
             return match.group("prefix") + quote(match.group("url"), safe="")
         else:
             return url
+
+    @classmethod
+    def _get_user_agent(cls, api_request):
+        user_agent = api_request.headers.get("USER-AGENT")
+        if user_agent:
+            return user_agent
+        else:
+            return cls._DEFAULT_USER_AGENT
 
 
 class API(falcon.API):
