@@ -35,17 +35,30 @@ class FacebookHooks:
             resp.status = falcon.HTTP_400
 
     def on_post(self, req, resp, scope):
-        payload = req.stream.read().decode("utf-8")
+        raw_data = req.stream.read()
+        payload = raw_data.decode("utf-8")
         self._logger.info("POST scope: %s payload: %r headers: %s", scope, payload, req.headers)
 
         try:
             with self._publisher as publisher:
                 publisher.send_event(scope, payload)
-            resp.status = falcon.HTTP_200
 
+            self._send_to_heroku(raw_data)
+            resp.status = falcon.HTTP_200
         except pika.exceptions.AMQPError:
             self._logger.exception("Exception while publishing to RabbitMQ.")
             resp.status = falcon.HTTP_500
+
+    def _send_to_heroku(self, raw_data):
+        """
+        This some kind of new endpoint for FB events. I don't know why it's needed
+        and what is there but Andre with Pavel asked for this now.
+        see https://is.roihunter.com/issues/18794
+        """
+        try:
+            requests.post("https://sheltered-garden-54333.herokuapp.com/webhook", data=raw_data, timeout=(5, 10))
+        except:
+            self._logger.exception("Unexpected error during sending event to Heroku endpoint.")
 
 
 class CorsProxy:
