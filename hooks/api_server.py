@@ -56,7 +56,10 @@ class FacebookHooks:
         see https://is.roihunter.com/issues/18794
         """
         try:
-            requests.post("https://sheltered-garden-54333.herokuapp.com/webhook", data=raw_data, timeout=(5, 10))
+            response = requests.post("https://sheltered-garden-54333.herokuapp.com/webhook", data=raw_data, timeout=(5, 10), headers={
+                "Content-Type": "application/json; charset=utf-8"
+            })
+            response.raise_for_status()
         except:
             self._logger.exception("Unexpected error during sending event to Heroku endpoint.")
 
