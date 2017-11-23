@@ -7,8 +7,7 @@ import falcon
 import pika.exceptions
 import requests
 
-from . import services
-from . import settings
+from . import services, settings
 
 
 _API_PREFIX = "/api/v1"
@@ -51,12 +50,20 @@ class FacebookHooks:
 
 class CorsProxy:
     _DEFAULT_USER_AGENT = "ROI Hunter/CORS proxy; http://roihunter.com/"
-    _ALLANI_PL_PATTERN = re.compile(r"(?P<prefix>http://st\.allani\.pl/.+/)(?P<url>http.+)$", re.UNICODE)
+    _ALLANI_PL_PATTERN = re.compile(r"(?P<prefix>https?://st\.allani\.pl/.+/)(?P<url>http.+)$", re.UNICODE)
+    _PRODUCTSUP_IO_PATTERN = re.compile(r"(?P<prefix>https?://[^.]+\.productsup\.io/img/site/\d+/data/)(?P<data>[^?#]+)(?P<suffix>.+)$", re.UNICODE)
 
     def __init__(self):
         self._logger = services.logger()
 
+    def on_get(self, req, resp):
+        self(req, resp)
+
     def __call__(self, req, resp):
+        """
+        This is obsolete and should be removed once proxy with "?url=..." will be used everywhere.
+        This code should be moved to method "on_get" and method "__call__" deleted.
+        """
         resp.set_header("access-control-allow-origin", "*")
         resp.set_header("access-control-allow-methods", "GET")
         resp.set_header("access-control-max-age", "21600")
@@ -64,8 +71,10 @@ class CorsProxy:
         if allow_headers:
             resp.set_header("access-control-allow-headers", allow_headers)
 
-        url = req.relative_uri.replace(_API_PREFIX + "/proxy/", "")
-        url = self._fix_exceptional_urls(url)
+        url = req.get_param("url")
+        if not url:  # FIXME: this block is obsolete and should be removed once proxy with "?url=..." will be used everywhere
+            url = req.relative_uri.replace(_API_PREFIX + "/proxy/", "")
+            url = self._fix_exceptional_urls(url)
 
         try:
             self._logger.info("Trying to proxy URL: %s", url)
@@ -76,8 +85,9 @@ class CorsProxy:
             resp.content_type = response.headers["Content-Type"]
             resp.status = falcon.HTTP_200
         except requests.HTTPError:
+            self._logger.exception("Not able to proxy URL: %s", url)
             resp.status = str(response.status_code) + " " + response.reason
-        except:
+        except Exception:
             self._logger.exception("Not able to proxy URL: %s", url)
             resp.status = falcon.HTTP_400
 
@@ -85,13 +95,18 @@ class CorsProxy:
         """
         This is here because we were not able to set this working by nginx so this is hack to handle our client properly.
         See http://is.roihunter.com/issues/11785#note-22 and related tasks for more info.
+
+        FIXME: this is obsolete and should be removed once proxy with "?url=..." will be used everywhere
         """
         match = self._ALLANI_PL_PATTERN.match(url)
-
-        if match:
+        if match:  # https://is.roihunter.com/issues/11785
             return match.group("prefix") + quote(match.group("url"), safe="")
-        else:
-            return url
+
+        match = self._PRODUCTSUP_IO_PATTERN.match(url)
+        if match:  # https://is.roihunter.com/issues/19496
+            return match.group("prefix") + quote(match.group("data"), safe="") + match.group("suffix")
+
+        return url
 
     @classmethod
     def _get_user_agent(cls, api_request):
@@ -107,4 +122,5 @@ class API(falcon.API):
         super().__init__(*args, **kwargs)
         self.add_route("/health", Health())
         self.add_route(_API_PREFIX + "/{scope}/fb/hooks", FacebookHooks())
-        self.add_sink(CorsProxy(), _API_PREFIX + "/proxy/")
+        self.add_route(_API_PREFIX + "/proxy", CorsProxy())
+        self.add_sink(CorsProxy(), _API_PREFIX + "/proxy/")  # FIXME: this is obsolete and should be removed once proxy with "?url=..." will be used everywhere
