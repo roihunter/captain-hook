@@ -7,7 +7,7 @@ pipeline {
     }
     parameters {
         string(
-            name: 'app_servers',
+            name: 'APP_SERVERS',
             defaultValue: '10.10.10.122',
             description: 'Deploy container to these servers. List of servers separated by comma.'
         )
@@ -37,7 +37,7 @@ pipeline {
                     string(credentialsId: 'docker-registry-azure', variable: 'DRpass')
                 ]) {
                     script {
-                        def servers = params['app_servers'].tokenize(',')
+                        def servers = params.APP_SERVERS.tokenize(',')
 
                         for (item in servers) {
                             sshagent(['5de2256c-107d-4e4a-a31e-2f33077619fe']) {
