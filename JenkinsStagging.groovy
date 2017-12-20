@@ -46,7 +46,7 @@ pipeline {
                                 docker pull roihunter.azurecr.io/captain-hook/staging
                                 docker stop captain-hook-staging
                                 docker rm -v captain-hook-staging
-                                docker run --detach -p 8006:8005 \
+                                docker run --detach -p 8008:8005 \
                                     --hostname=captain-hook-staging-"$item" \
                                     --name=captain-hook-staging \
                                     --restart=always \

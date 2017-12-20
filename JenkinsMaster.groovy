@@ -46,7 +46,7 @@ pipeline {
                                 docker pull roihunter.azurecr.io/captain-hook/master
                                 docker stop captain-hook-master
                                 docker rm -v captain-hook-master
-                                docker run --detach -p 8005:8005 \
+                                docker run --detach -p 8007:8005 \
                                     --hostname=captain-hook-master-"$item" \
                                     --name=captain-hook-master \
                                     --restart=always \
