@@ -11,15 +11,30 @@ pipeline {
             defaultValue: '10.10.10.122',
             description: 'Deploy container to these servers. List of servers separated by comma.'
         )
+        booleanParam(
+            name: "BUILD_IMAGE",
+            defaultValue: true,
+            description: "Build image and upload it to Docker registry"
+        )
     }
     stages {
         stage('Build') {
+            when {
+                expression {
+                    return params.BUILD_IMAGE
+                }
+            }
             steps {
                 sh "docker build --rm=true -t captain-hook-staging ."
             }
         }
 
         stage('Prepare and upload to registry ') {
+            when {
+                expression {
+                    return params.BUILD_IMAGE
+                }
+            }
             steps {
                 withCredentials([string(credentialsId: 'docker-registry-azure', variable: 'DRpass')]) {
                     sh 'docker login roihunter.azurecr.io -u roihunter -p "$DRpass"'
