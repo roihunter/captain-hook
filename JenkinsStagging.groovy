@@ -16,6 +16,26 @@ pipeline {
             defaultValue: true,
             description: "Build image and upload it to Docker registry"
         )
+        string(
+            name: 'RABBIT_HOST',
+            defaultValue: '10.10.10.96',
+            description: 'RabbitMQ server'
+        )
+        string(
+            name: 'RABBIT_PORT',
+            defaultValue: '5672',
+            description: 'RabbitMQ port'
+        )
+        string(
+            name: 'GRAYLOG_HOST',
+            defaultValue: 'logs.roihunter.com',
+            description: 'Graylog server'
+        )
+        string(
+            name: 'GRAYLOG_PORT',
+            defaultValue: '12212',
+            description: 'Graylog port'
+        )
     }
     stages {
         stage('Build') {
@@ -49,7 +69,13 @@ pipeline {
         stage('Deploy API container') {
             steps {
                 withCredentials([
-                    string(credentialsId: 'docker-registry-azure', variable: 'DRpass')
+                    string(credentialsId: 'docker-registry-azure', variable: 'DRpass'),
+                    string(credentialsId: "captainhook-staging-facebook-verify-token", variable: "captainhook-facebook-verify-token" ),
+                    usernamePassword(
+                        credentialsId: "captainhook-staging-rabbit-userneme-password",
+                        passwordVariable: "captainhook-rabbit-password",
+                        usernameVariable: "captainhook-rabbit-userneme"
+                    )                    
                 ]) {
                     script {
                         def servers = params.APP_SERVERS.tokenize(',')
@@ -62,6 +88,14 @@ pipeline {
                                 docker stop captain-hook-staging
                                 docker rm -v captain-hook-staging
                                 docker run --detach -p 8008:8005 \
+                                    -e "CAPTAINHOOK_PROFILE=staging" \
+                                    -e "CAPTAINHOOK_FACEBOOK_VERIFY_TOKEN=${captainhook-facebook-verify-token}" \
+                                    -e "CAPTAINHOOK_RABBIT_LOGIN=${captainhook-rabbit-userneme}" \
+                                    -e "CAPTAINHOOK_RABBIT_PASSWORD=${captainhook-rabbit-password}" \
+                                    -e "CAPTAINHOOK_RABBIT_HOST=${params.RABBIT_HOST}" \
+                                    -e "CAPTAINHOOK_RABBIT_PORT=${params.RABBIT_PORT}" \
+                                    -e "CAPTAINHOOK_GRAYLOG_HOST=${params.GRAYLOG_HOST}" \
+                                    -e "CAPTAINHOOK_GRAYLOG_PORT=${params.GRAYLOG_PORT}" \
                                     --hostname=captain-hook-staging-"$item" \
                                     --name=captain-hook-staging \
                                     --restart=always \
