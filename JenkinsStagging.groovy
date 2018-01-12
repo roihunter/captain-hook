@@ -88,6 +88,8 @@ pipeline {
                                 docker stop captain-hook-staging
                                 docker rm -v captain-hook-staging
                                 docker run --detach -p 8008:8005 \
+                                    -e "GUNICORN_BIND=0.0.0.0:8005" \
+                                    -e "GUNICORN_WORKERS=4" \
                                     -e "CAPTAINHOOK_PROFILE=staging" \
                                     -e "CAPTAINHOOK_FACEBOOK_VERIFY_TOKEN=${captainhook-facebook-verify-token}" \
                                     -e "CAPTAINHOOK_RABBIT_LOGIN=${captainhook-rabbit-userneme}" \

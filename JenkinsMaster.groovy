@@ -88,6 +88,8 @@ pipeline {
                                 docker stop captain-hook-master
                                 docker rm -v captain-hook-master
                                 docker run --detach -p 8007:8005 \
+                                    -e "GUNICORN_BIND=0.0.0.0:8005" \
+                                    -e "GUNICORN_WORKERS=4" \
                                     -e "CAPTAINHOOK_PROFILE=master" \
                                     -e "CAPTAINHOOK_FACEBOOK_VERIFY_TOKEN=${captainhook-facebook-verify-token}" \
                                     -e "CAPTAINHOOK_RABBIT_LOGIN=${captainhook-rabbit-userneme}" \
