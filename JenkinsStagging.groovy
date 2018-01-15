@@ -70,11 +70,11 @@ pipeline {
             steps {
                 withCredentials([
                     string(credentialsId: 'docker-registry-azure', variable: 'DRpass'),
-                    string(credentialsId: "captainhook-staging-facebook-verify-token", variable: "captainhook-facebook-verify-token" ),
+                    string(credentialsId: "captainhook-staging-facebook-verify-token", variable: "captainhook_facebook_verify_token" ),
                     usernamePassword(
-                        credentialsId: "captainhook-staging-rabbit-userneme-password",
-                        passwordVariable: "captainhook-rabbit-password",
-                        usernameVariable: "captainhook-rabbit-userneme"
+                        credentialsId: "captainhook-staging-rabbit-username-password",
+                        passwordVariable: "captainhook_rabbit_password",
+                        usernameVariable: "captainhook_rabbit_username"
                     )                    
                 ]) {
                     script {
@@ -85,20 +85,20 @@ pipeline {
                                 sh """ssh -oStrictHostKeyChecking=no -t -t jenkins@${item} <<EOF
                                 docker login roihunter.azurecr.io -u roihunter -p "$DRpass"
                                 docker pull roihunter.azurecr.io/captain-hook/staging
-                                docker stop captain-hook-staging
-                                docker rm -v captain-hook-staging
+                                docker stop captain-hook-staging; true
+                                docker rm -v captain-hook-staging; true
                                 docker run --detach -p 8008:8005 \
                                     -e "GUNICORN_BIND=0.0.0.0:8005" \
                                     -e "GUNICORN_WORKERS=4" \
                                     -e "CAPTAINHOOK_PROFILE=staging" \
-                                    -e "CAPTAINHOOK_FACEBOOK_VERIFY_TOKEN=${captainhook-facebook-verify-token}" \
-                                    -e "CAPTAINHOOK_RABBIT_LOGIN=${captainhook-rabbit-userneme}" \
-                                    -e "CAPTAINHOOK_RABBIT_PASSWORD=${captainhook-rabbit-password}" \
+                                    -e "CAPTAINHOOK_FACEBOOK_VERIFY_TOKEN=${captainhook_facebook_verify_token}" \
+                                    -e "CAPTAINHOOK_RABBIT_LOGIN=${captainhook_rabbit_username}" \
+                                    -e "CAPTAINHOOK_RABBIT_PASSWORD=${captainhook_rabbit_password}" \
                                     -e "CAPTAINHOOK_RABBIT_HOST=${params.RABBIT_HOST}" \
                                     -e "CAPTAINHOOK_RABBIT_PORT=${params.RABBIT_PORT}" \
                                     -e "CAPTAINHOOK_GRAYLOG_HOST=${params.GRAYLOG_HOST}" \
                                     -e "CAPTAINHOOK_GRAYLOG_PORT=${params.GRAYLOG_PORT}" \
-                                    --hostname=captain-hook-staging-"$item" \
+                                    --hostname=captain-hook-staging-${item} \
                                     --name=captain-hook-staging \
                                     --restart=always \
                                     roihunter.azurecr.io/captain-hook/staging
