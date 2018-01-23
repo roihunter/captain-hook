@@ -26,16 +26,6 @@ pipeline {
             defaultValue: '5672',
             description: 'RabbitMQ port'
         )
-        string(
-            name: 'GRAYLOG_HOST',
-            defaultValue: 'logs.roihunter.com',
-            description: 'Graylog server'
-        )
-        string(
-            name: 'GRAYLOG_PORT',
-            defaultValue: '12212',
-            description: 'Graylog port'
-        )
     }
     stages {
         stage('Build') {
@@ -96,8 +86,6 @@ pipeline {
                                     -e "CAPTAINHOOK_RABBIT_PASSWORD=${captainhook_rabbit_password}" \
                                     -e "CAPTAINHOOK_RABBIT_HOST=${params.RABBIT_HOST}" \
                                     -e "CAPTAINHOOK_RABBIT_PORT=${params.RABBIT_PORT}" \
-                                    -e "CAPTAINHOOK_GRAYLOG_HOST=${params.GRAYLOG_HOST}" \
-                                    -e "CAPTAINHOOK_GRAYLOG_PORT=${params.GRAYLOG_PORT}" \
                                     --hostname=captain-hook-staging-${item} \
                                     --name=captain-hook-staging \
                                     --restart=always \
