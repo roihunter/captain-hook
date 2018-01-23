@@ -2,11 +2,13 @@
 
 import graypy
 import logging
+from functools import lru_cache
 
 from . import settings
 from .publisher import RabbitPublisher
 
 
+@lru_cache(maxsize=1)
 def logger():
     logger = logging.getLogger("hooks")
     logger.setLevel(logging.DEBUG if settings.DEVELOPMENT_MODE else logging.INFO)
@@ -28,6 +30,7 @@ def logger():
     return logger
 
 
+@lru_cache(maxsize=1)
 def publisher():
     return RabbitPublisher(
         settings.RABBIT_LOGIN,
