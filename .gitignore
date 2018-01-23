@@ -1,5 +1,6 @@
 # Project specific files
-/hooks/settings_local.py
+/hooks/settings_local.py  # This line can be removed when new settings profiles is deployed on master
+/hooks/settings/_settings_local.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
