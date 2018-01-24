@@ -38,7 +38,6 @@ pipeline {
                 sh "docker build --rm=true -t captain-hook-staging ."
             }
         }
-
         stage('Prepare and upload to registry ') {
             when {
                 expression {
@@ -55,7 +54,6 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy API container') {
             steps {
                 withCredentials([

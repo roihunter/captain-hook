@@ -28,17 +28,16 @@ pipeline {
         )
     }
     stages {
-        when {
-            expression {
-                return params.BUILD_IMAGE
-            }
-        }
         stage('Build') {
+            when {
+                expression {
+                    return params.BUILD_IMAGE
+                }
+            }
             steps {
                 sh "docker build --rm=true -t captain-hook-master ."
             }
         }
-
         stage('Prepare and upload to registry ') {
             when {
                 expression {
@@ -55,7 +54,6 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy API container') {
             steps {
                 withCredentials([
