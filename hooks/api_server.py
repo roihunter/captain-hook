@@ -52,6 +52,7 @@ class CorsProxy:
     _DEFAULT_USER_AGENT = "ROI Hunter/CORS proxy; http://roihunter.com/"
     _ALLANI_PL_PATTERN = re.compile(r"(?P<prefix>https?://st\.allani\.pl/.+/)(?P<url>http.+)$", re.UNICODE)
     _PRODUCTSUP_IO_PATTERN = re.compile(r"(?P<prefix>https?://[^.]+\.productsup\.io/img/site/\d+/data/)(?P<data>[^?#]+)(?P<suffix>.*)$", re.UNICODE)
+    _TIMEOUT_IN_SECONDS = 10
 
     def __init__(self):
         self._logger = services.logger()
@@ -78,7 +79,7 @@ class CorsProxy:
 
         try:
             self._logger.info("Trying to proxy URL: %s", url)
-            response = requests.get(url, headers={"User-Agent": self._get_user_agent(req)})
+            response = requests.get(url, timeout=self._TIMEOUT_IN_SECONDS, headers={"User-Agent": self._get_user_agent(req)})
             response.raise_for_status()
 
             resp.data = response.content
