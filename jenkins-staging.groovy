@@ -18,12 +18,12 @@ pipeline {
         )
         string(
             name: 'RABBIT_HOST',
-            defaultValue: '10.10.10.96',
+            defaultValue: '195.201.160.243',
             description: 'RabbitMQ server'
         )
         string(
             name: 'RABBIT_PORT',
-            defaultValue: '5672',
+            defaultValue: '32769',
             description: 'RabbitMQ port'
         )
     }
