@@ -7,7 +7,7 @@
 python -m venv .env
 . ./.env/bin/activate  # or for BFU .env\Scripts\activate.bat
 pip install -U pip wheel
-pip install --use-wheel -r requirements-dev.txt
+pip install -r requirements-dev.txt
 ```
 Create local configuration file `hooks/settings_local.py`.
 
@@ -28,7 +28,7 @@ Create local configuration file `hooks/settings_local.py`.
 
 *  `/api/v1/proxy/{url}`
 	* *url* can be any url, e.g. http://www.google.com
-	
+
 ## Docker
 
 Build image from Dockerfile.
