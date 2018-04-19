@@ -15,7 +15,7 @@ WORKDIR /app
 
 # Install Python dependencies
 ADD ./requirements.txt /app
-RUN pip3 install -U pip wheel && pip3 install --use-wheel -r requirements.txt
+RUN pip3 install -U pip wheel && pip3 install -r requirements.txt
 
 # Add all files to container
 ADD . /app
