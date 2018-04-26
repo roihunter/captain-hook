@@ -9,39 +9,29 @@ pipeline {
 
     parameters {
         booleanParam(
-            name: "BUILD_IMAGE",
+            name: 'SEND_SLACK_NOTIFICATION',
             defaultValue: true,
-            description: "Build image and upload it to Docker registry"
+            description: 'Send notification about deploy to Slack.'
         )
     }
 
-    stages {
-        stage('Build') {
-            when {
-                expression {
-                    return params.BUILD_IMAGE
-                }
-            }
-            steps {
-                sh "docker build --rm=true -t roihunter.azurecr.io/captain-hook/staging ."
+    environment {
+        // real branch is "dev", but we use it as "staging"
+        BRANCH_NAME = "staging"
+    }
 
-                withCredentials([string(credentialsId: 'docker-registry-azure', variable: 'DRpass')]) {
-                    sh 'docker login roihunter.azurecr.io -u roihunter -p "$DRpass"'
-                    sh("""
-                        for tag in $BUILD_NUMBER latest; do
-                            docker tag roihunter.azurecr.io/captain-hook/staging roihunter.azurecr.io/captain-hook/staging:\${tag}
-                            docker push roihunter.azurecr.io/captain-hook/staging:\${tag}
-                            docker rmi roihunter.azurecr.io/captain-hook/staging:\${tag}
-                        done
-                    """)
+    stages {
+        stage("Build Docker image") {
+            steps {
+                script {
+                    def rootDir = pwd()
+                    def build = load "${rootDir}/jenkins/pipeline/_build.groovy"
+                    build.buildDockerImage(env.BRANCH_NAME)
                 }
             }
         }
-        stage('Deploy API container') {
-            environment {
-                IMAGE_TAG = getImageTag(params.BUILD_IMAGE)
-            }
 
+        stage('Deploy API to Kubernetes') {
             steps {
                 script {
                     kubernetesDeploy(
@@ -66,26 +56,27 @@ pipeline {
                 }
             }
         }
-        stage('Send notification') {
+
+        stage('Send Slack notification') {
+            when {
+                expression {
+                    return params.SEND_SLACK_NOTIFICATION
+                }
+            }
             steps {
-                withCredentials([string(credentialsId: 'slack-bot-token', variable: 'slackToken')]) {
-                    slackSend channel: 'deploy', message: 'Captain Hook staging deployed', color: '#4280f4', token: slackToken, botUser: true
+                script {
+                    def rootDir = pwd()
+                    def utils = load "${rootDir}/jenkins/pipeline/_utils.groovy"
+                    utils.sendSlackNotification(env.BRANCH_NAME, '#D39D47')
                 }
             }
         }
     }
+
     post {
         always {
             // Clean Workspace
             cleanWs()
         }
-    }
-}
-
-String getImageTag(Boolean build_image) {
-    if (build_image) {
-        return env.BUILD_NUMBER
-    } else {
-        return "latest"
     }
 }

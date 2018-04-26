@@ -20,7 +20,7 @@ spec:
         spec:
             containers:
                 - name: captain-hook-staging
-                  image: roihunter.azurecr.io/captain-hook/staging:$IMAGE_TAG
+                  image: roihunter.azurecr.io/captain-hook/staging:$BUILD_NUMBER
                   imagePullPolicy: Always
                   readinessProbe:
                     httpGet:
@@ -54,7 +54,7 @@ spec:
                         value: '195.201.160.243'
                       - name: CAPTAINHOOK_RABBIT_PORT
                         value: '32769'
-                  ports: 
+                  ports:
                     - containerPort: 8005
             imagePullSecrets:
                 - name: regsecret
