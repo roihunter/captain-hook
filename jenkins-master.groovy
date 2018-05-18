@@ -20,7 +20,7 @@ pipeline {
         )
         string(
             name: 'RABBIT_HOST',
-            defaultValue: '10.10.10.96',
+            defaultValue: '35.233.65.128',
             description: 'RabbitMQ server'
         )
         string(
