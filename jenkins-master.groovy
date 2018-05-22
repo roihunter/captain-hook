@@ -8,26 +8,6 @@ pipeline {
     }
 
     parameters {
-        string(
-            name: 'APP_SERVERS',
-            defaultValue: '10.10.10.122',
-            description: 'Deploy container to these servers. List of servers separated by comma.'
-        )
-        booleanParam(
-            name: "BUILD_IMAGE",
-            defaultValue: true,
-            description: "Build image and upload it to Docker registry"
-        )
-        string(
-            name: 'RABBIT_HOST',
-            defaultValue: '35.233.65.128',
-            description: 'RabbitMQ server'
-        )
-        string(
-            name: 'RABBIT_PORT',
-            defaultValue: '5672',
-            description: 'RabbitMQ port'
-        )
         booleanParam(
             name: 'SEND_SLACK_NOTIFICATION',
             defaultValue: true,
@@ -41,11 +21,6 @@ pipeline {
 
     stages {
         stage("Build Docker image") {
-            when {
-                expression {
-                    return params.BUILD_IMAGE
-                }
-            }
             steps {
                 script {
                     def rootDir = pwd()
