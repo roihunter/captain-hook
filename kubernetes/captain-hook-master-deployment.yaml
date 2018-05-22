@@ -51,9 +51,9 @@ spec:
                                 name: captainhook-master-rabbit-secret
                                 key: password
                       - name: CAPTAINHOOK_RABBIT_HOST
-                        value: '195.201.160.243'
+                        value: '35.233.65.128'
                       - name: CAPTAINHOOK_RABBIT_PORT
-                        value: '32769'
+                        value: '5672'
                   ports:
                     - containerPort: 8005
             imagePullSecrets:
