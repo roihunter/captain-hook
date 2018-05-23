@@ -25,7 +25,8 @@ pipeline {
                 script {
                     def rootDir = pwd()
                     def build = load "${rootDir}/jenkins/pipeline/_build.groovy"
-                    build.buildDockerImage(env.BRANCH_NAME)
+                    // build.buildDockerImage(env.BRANCH_NAME)
+                    build.buildDockerImage("feature-kubernetes-master-deploy")
                 }
             }
         }
