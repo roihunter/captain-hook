@@ -20,8 +20,7 @@ spec:
         spec:
             containers:
                 - name: captain-hook-master
-                  # image: roihunter.azurecr.io/captain-hook/master:$BUILD_NUMBER
-                  image: roihunter.azurecr.io/captain-hook/feature-kubernetes-master-deploy:$BUILD_NUMBER
+                  image: roihunter.azurecr.io/captain-hook/master:$BUILD_NUMBER
                   imagePullPolicy: Always
                   readinessProbe:
                     httpGet:
