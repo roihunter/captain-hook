@@ -1,0 +1,60 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+    name: captain-hook-master-deployment
+    labels:
+        app: captain-hook
+        tier: backend
+        maintainer: python
+spec:
+    replicas: 2
+    maxUnavailable: 1
+    revisionHistoryLimit: 3
+    selector:
+        matchLabels:
+            app: captain-hook
+    template:
+        metadata:
+            labels:
+                app: captain-hook
+        spec:
+            containers:
+                - name: captain-hook-master
+                  image: roihunter.azurecr.io/captain-hook/master:$BUILD_NUMBER
+                  imagePullPolicy: Always
+                  readinessProbe:
+                    httpGet:
+                      path: /health
+                      port: 8005
+                    initialDelaySeconds: 5
+                    periodSeconds: 10
+                  env:
+                      - name: GUNICORN_BIND
+                        value: '0.0.0.0:8005'
+                      - name: GUNICORN_WORKERS
+                        value: '1'
+                      - name: CAPTAINHOOK_PROFILE
+                        value: 'master'
+                      - name: CAPTAINHOOK_FACEBOOK_VERIFY_TOKEN
+                        valueFrom:
+                            secretKeyRef:
+                                name: captainhook-facebook-verify-token
+                                key: secret
+                      - name: CAPTAINHOOK_RABBIT_LOGIN
+                        valueFrom:
+                            secretKeyRef:
+                                name: captainhook-master-rabbit-secret
+                                key: username
+                      - name: CAPTAINHOOK_RABBIT_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: captainhook-master-rabbit-secret
+                                key: password
+                      - name: CAPTAINHOOK_RABBIT_HOST
+                        value: '35.233.65.128'
+                      - name: CAPTAINHOOK_RABBIT_PORT
+                        value: '5672'
+                  ports:
+                    - containerPort: 8005
+            imagePullSecrets:
+                - name: regsecret
