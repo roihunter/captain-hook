@@ -45,6 +45,26 @@ class FacebookHooks:
             resp.status = falcon.HTTP_500
 
 
+class HubspotHooks:
+    def __init__(self):
+        self._publisher = services.publisher()
+        self._logger = services.logger()
+
+    def on_post(self, req, resp):
+        raw_data = req.stream.read()
+        payload = raw_data.decode("utf-8")
+        self._logger.info("POST hubspot payload: %r headers: %s", payload, req.headers)
+
+        try:
+            with self._publisher as publisher:
+                publisher.send_event('hubspot', payload)
+
+            resp.status = falcon.HTTP_200
+        except pika.exceptions.AMQPError:
+            self._logger.exception("Exception while publishing to RabbitMQ.")
+            resp.status = falcon.HTTP_500
+
+
 class CorsProxy:
     _DEFAULT_USER_AGENT = "ROI Hunter/CORS proxy; http://roihunter.com/"
     _TIMEOUT_IN_SECONDS = (10, 20)
@@ -91,4 +111,5 @@ class API(falcon.API):
         super().__init__(*args, **kwargs)
         self.add_route("/health", Health())
         self.add_route(_API_PREFIX + "/{scope}/fb/hooks", FacebookHooks())
+        self.add_route(_API_PREFIX + "/hubspot/hooks", HubspotHooks())
         self.add_route(_API_PREFIX + "/proxy", CorsProxy())
