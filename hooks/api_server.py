@@ -57,7 +57,7 @@ class HubspotHooks:
 
         try:
             with self._publisher as publisher:
-                publisher.send_event('hubspot', payload)
+                publisher.send_hubspot_event(payload)
 
             resp.status = falcon.HTTP_200
         except pika.exceptions.AMQPError:

@@ -37,3 +37,16 @@ class RabbitPublisher:
                 delivery_mode=self.PERSISTENT_MESSAGE_FLAG
             )
         )
+
+    def send_hubspot_event(self, json_data):
+        self._channel.basic_publish(
+            exchange=self._exchange_name,
+            routing_key="hubspot",
+            body=json_data,
+            properties=pika.BasicProperties(
+                headers={"__TypeId__": "HubspotEventMessage"},
+                content_encoding="utf-8",
+                content_type="application/json",
+                delivery_mode=self.PERSISTENT_MESSAGE_FLAG
+            )
+        )
