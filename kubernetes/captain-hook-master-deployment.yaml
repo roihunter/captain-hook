@@ -56,5 +56,9 @@ spec:
                         value: '5672'
                   ports:
                     - containerPort: 8005
+                  resources:
+                    limits:
+                      memory: "256Mi"
+                      cpu: "100m"
             imagePullSecrets:
                 - name: regsecret
