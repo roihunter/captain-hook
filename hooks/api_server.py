@@ -67,7 +67,7 @@ class HubspotHooks:
 
 class CorsProxy:
     _DEFAULT_USER_AGENT = "ROI Hunter/CORS proxy; http://roihunter.com/"
-    _TIMEOUT_IN_SECONDS = (10, 20)
+    _TIMEOUT_IN_SECONDS = (7, 10)
 
     def __init__(self):
         self._logger = services.logger()
