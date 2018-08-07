@@ -19,7 +19,7 @@ class RabbitPublisher:
         params = pika.ConnectionParameters(host=self._host, port=self._port, virtual_host=self._virtual_host, credentials=credentials)
         self._connection = pika.BlockingConnection(params)
         self._channel = self._connection.channel()
-        self._channel.exchange_declare(exchange=self._exchange_name, type="topic", durable=True)
+        self._channel.exchange_declare(exchange=self._exchange_name, exchange_type="topic", durable=True)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
