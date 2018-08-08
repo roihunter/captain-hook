@@ -12,7 +12,7 @@ import os
 workers = 4
 bind = "0.0.0.0:8005"
 worker_class = "eventlet"
-worker_connections = 10
+worker_connections = 100
 
 # Overwrite some Gunicorns params by ENV variables
 for k, v in os.environ.items():
