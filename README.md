@@ -3,13 +3,21 @@
 μ-service for subscriptions from Facebook
 
 ## Development setup
+
+### Environment
+
 ```sh
-python -m venv .env
-. ./.env/bin/activate  # or for BFU .env\Scripts\activate.bat
-pip install -U pip wheel
-pip install -r requirements-dev.txt
+pip install pipenv
+pipenv install
 ```
-Create local configuration file `hooks/settings_local.py`.
+To run python commands inside the virtual environment use `pipenv shell`, which gets you into the environment,
+to run a single command in the environment `pipenv run <command>` can be used.
+
+To use the virtual environment in your IDE get its location via `pipenv --venv`.
+
+### Configuration
+
+Create local configuration file `hooks/settings/_settings_local.py`.
 
 ## API server
 
@@ -29,7 +37,7 @@ Create local configuration file `hooks/settings_local.py`.
 *  `/api/v1/hubspot/hooks`
 	* not scoped, as Hubspot doesn't have a staging version
 
-*  `/api/v1/proxy/{url}`
+*  `/api/v1/proxy/?url={url}`
 	* *url* can be any url, e.g. http://www.google.com
 
 ## Docker
