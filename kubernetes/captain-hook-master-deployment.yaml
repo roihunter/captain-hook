@@ -52,9 +52,25 @@ spec:
                                 name: captainhook-master-rabbit-secret
                                 key: password
                       - name: CAPTAINHOOK_RABBIT_HOST
-                        value: '35.233.65.128'
-                      - name: CAPTAINHOOK_RABBIT_PORT
-                        value: '5672'
+                        valueFrom:
+                            secretKeyRef:
+                                name: captainhook-master-rabbit-host
+                                key: secret
+                      - name: CAPTAINHOOK_RABBIT_LOGIN_STAGING
+                        valueFrom:
+                            secretKeyRef:
+                                name: captainhook-staging-rabbit-secret
+                                key: username
+                      - name: CAPTAINHOOK_RABBIT_PASSWORD_STAGING
+                        valueFrom:
+                            secretKeyRef:
+                                name: captainhook-staging-rabbit-secret
+                                key: password
+                      - name: CAPTAINHOOK_RABBIT_HOST_STAGING
+                        valueFrom:
+                            secretKeyRef:
+                                name: captainhook-staging-rabbit-host
+                                key: secret
                   ports:
                     - containerPort: 8005
                   resources:

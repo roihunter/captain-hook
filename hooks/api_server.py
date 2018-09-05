@@ -48,6 +48,7 @@ class FacebookHooks:
 class HubspotHooks:
     def __init__(self):
         self._publisher = services.publisher()
+        self._publisher_staging = services.publisher_staging()
         self._logger = services.logger()
 
     def on_post(self, req, resp):
@@ -58,6 +59,11 @@ class HubspotHooks:
         try:
             with self._publisher as publisher:
                 publisher.send_hubspot_event(payload)
+
+            # master Cpt. Hook instance should forward messages to both master & staging Rabbit, see https://is.roihunter.com/issues/25196
+            if self._publisher_staging:
+                with self._publisher_staging as publisher_staging:
+                    publisher_staging.send_hubspot_event(payload)
 
             resp.status = falcon.HTTP_200
         except pika.exceptions.AMQPError:

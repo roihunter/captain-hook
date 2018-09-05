@@ -40,3 +40,18 @@ def publisher():
         settings.RABBIT_VIRTUAL_HOST,
         settings.RABBIT_EXCHANGE
     )
+
+
+@lru_cache(maxsize=1)
+def publisher_staging():
+    if settings.PROFILE == "staging":
+        return None
+
+    return RabbitPublisher(
+        settings.RABBIT_LOGIN_STAGING,
+        settings.RABBIT_PASSWORD_STAGING,
+        settings.RABBIT_HOST_STAGING,
+        settings.RABBIT_PORT_STAGING,
+        settings.RABBIT_VIRTUAL_HOST,
+        settings.RABBIT_EXCHANGE
+    )
