@@ -51,9 +51,10 @@ spec:
                                 name: captainhook-staging-rabbit-secret
                                 key: password
                       - name: CAPTAINHOOK_RABBIT_HOST
-                        value: '195.201.160.243'
-                      - name: CAPTAINHOOK_RABBIT_PORT
-                        value: '32769'
+                        valueFrom:
+                            secretKeyRef:
+                                name: captainhook-staging-rabbit-host
+                                key: secret
                   ports:
                     - containerPort: 8005
             imagePullSecrets:

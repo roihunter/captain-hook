@@ -4,13 +4,13 @@ from os import environ, path
 
 from ._settings_default import *
 
-profile = environ.get("CAPTAINHOOK_PROFILE", "local")
+PROFILE = environ.get("CAPTAINHOOK_PROFILE", "local")
 
-if profile == "master":
+if PROFILE == "master":
     from ._settings_master import *
-elif profile == "staging":
+elif PROFILE == "staging":
     from ._settings_staging import *
-elif profile == "local":
+elif PROFILE == "local":
     try:
         from ._settings_local import *
     except ImportError:
@@ -20,4 +20,4 @@ elif profile == "local":
             )
         )
 else:
-    raise ValueError("Unsupported settings profile. Use one of {}. Given: '{}'.".format(("master", "staging", "local"), profile))
+    raise ValueError("Unsupported settings profile. Use one of {}. Given: '{}'.".format(("master", "staging", "local"), PROFILE))
