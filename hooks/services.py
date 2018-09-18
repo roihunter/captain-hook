@@ -16,16 +16,16 @@ def logger():
     for handler in logging.root.handlers:
         handler.addFilter(logging.Filter("hooks"))
 
-    handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter(
-        "[%(levelname)s] %(asctime)s at %(filename)s:%(lineno)d (%(processName)s) -- %(message)s",
-        "%Y-%m-%d %H:%M:%S")
-    )
-    logger.addHandler(handler)
-
     if not settings.DEVELOPMENT_MODE:
         handler = graypy.GELFHandler(settings.GRAYLOG_HOST, settings.GRAYLOG_PORT)
-        logger.addHandler(handler)
+    else:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter(
+            "[%(levelname)s] %(asctime)s at %(filename)s:%(lineno)d (%(processName)s) -- %(message)s",
+            "%Y-%m-%d %H:%M:%S")
+        )
+
+    logger.addHandler(handler)
 
     return logger
 
