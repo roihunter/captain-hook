@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import eventlet
 import falcon
 import pika.exceptions
-import requests
 
 from . import services, settings
 
@@ -119,3 +119,6 @@ class API(falcon.API):
         self.add_route(_API_PREFIX + "/{scope}/fb/hooks", FacebookHooks())
         self.add_route(_API_PREFIX + "/hubspot/hooks", HubspotHooks())
         self.add_route(_API_PREFIX + "/proxy", CorsProxy())
+
+        global requests
+        requests = eventlet.import_patched("requests")
