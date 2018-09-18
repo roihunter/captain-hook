@@ -7,13 +7,16 @@ MAINTAINER ROI Hunter
 ENV TZ=Europe/Prague
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+RUN pip install pipenv
+
 WORKDIR /app
 
-ADD ./requirements.txt /app
+COPY ./Pipfile ./
+COPY ./Pipfile.lock ./
 
-RUN pip install -U pip wheel && pip install -r requirements.txt
+RUN pipenv install --deploy --system
 
-ADD . /app
+COPY . /app
 
 EXPOSE 8005
 
