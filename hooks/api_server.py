@@ -71,54 +71,12 @@ class HubspotHooks:
             resp.status = falcon.HTTP_500
 
 
-class CorsProxy:
-    _DEFAULT_USER_AGENT = "ROI Hunter/CORS proxy; http://roihunter.com/"
-    _TIMEOUT_IN_SECONDS = (7, 10)
-
-    def __init__(self):
-        self._logger = services.logger()
-
-    def on_get(self, req, resp):
-        resp.set_header("access-control-allow-origin", "*")
-        resp.set_header("access-control-allow-methods", "GET")
-        resp.set_header("access-control-max-age", "21600")
-        allow_headers = req.get_header("access-control-request-headers")
-        if allow_headers:
-            resp.set_header("access-control-allow-headers", allow_headers)
-
-        url = req.get_param("url")
-
-        try:
-            self._logger.info("Trying to proxy URL: %s", url)
-            response = requests.get(url, timeout=self._TIMEOUT_IN_SECONDS, headers={"User-Agent": self._get_user_agent(req)})
-            response.raise_for_status()
-
-            resp.data = response.content
-            resp.content_type = response.headers["Content-Type"]
-            resp.status = falcon.HTTP_200
-        except requests.HTTPError:
-            self._logger.exception("Not able to proxy URL: %s", url)
-            resp.status = str(response.status_code) + " " + response.reason
-        except Exception:
-            self._logger.exception("Not able to proxy URL: %s", url)
-            resp.status = falcon.HTTP_400
-
-    @classmethod
-    def _get_user_agent(cls, api_request):
-        user_agent = api_request.headers.get("USER-AGENT")
-        if user_agent:
-            return user_agent
-        else:
-            return cls._DEFAULT_USER_AGENT
-
-
 class API(falcon.API):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.add_route("/health", Health())
         self.add_route(_API_PREFIX + "/{scope}/fb/hooks", FacebookHooks())
         self.add_route(_API_PREFIX + "/hubspot/hooks", HubspotHooks())
-        self.add_route(_API_PREFIX + "/proxy", CorsProxy())
 
         global requests
         requests = eventlet.import_patched("requests")

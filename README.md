@@ -37,8 +37,6 @@ Create local configuration file `hooks/settings/_settings_local.py`.
 *  `/api/v1/hubspot/hooks`
 	* not scoped, as Hubspot doesn't have a staging version
 
-*  `/api/v1/proxy/?url={url}`
-	* *url* can be any url, e.g. http://www.google.com
 
 ## Docker
 
